@@ -1,0 +1,82 @@
+:root{
+    height: 100%;
+}
+
+body{
+    height: 99%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgb(145,92,173);
+    background: linear-gradient(219deg, rgba(145,92,173,1) 0%, rgba(90,173,157,1) 50%, rgba(17,88,172,1) 100%);
+    background-size: cover;
+}
+ 
+button{
+    cursor: pointer;
+}
+
+.switch{
+    border-radius: 20px;
+    color: white;
+    background-color: black;
+    border: 2px solid grey;
+    box-shadow: 0px 2px 5px black;
+    align-self: flex-start;
+}
+
+.switch:hover{
+    box-shadow: 2px 0px 5px -2px black, -2px 0px 5px -2px black;
+}
+
+input{
+    text-align: center;
+    border-radius: 2vh;
+    height: 3vh;
+    width: max(220px, 30vw);
+    border: 2px solid grey;
+}
+
+#search{
+    padding: 0;
+    background: none;
+    border: none;
+}
+
+#search img{
+    vertical-align: middle;
+    width: 25px;
+
+}
+
+.content{
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+
+.weatherNow{
+    margin-top: 10vh;
+}
+
+.weatherNextWeek{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5vw;
+    justify-content: center;
+    margin-top: auto;
+    margin-bottom: 5vh;
+}
+
+.weatherNextWeek>div{
+    width: 210px;
+    color: white;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    text-align: center;
+    border-radius: 10px;
+}
+
