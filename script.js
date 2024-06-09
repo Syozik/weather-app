@@ -35,7 +35,7 @@ class WeatherApp{
 
     getWeatherAPI(){
         return new Promise((resolve) => {
-            fetch(`http://api.weatherapi.com/v1/forecast.json?key=${key}&q=${this.location}&days=${this.days}`, {mode:"cors"})
+            fetch(`http://api.weatherapi.com/v1/forecast.json?key=${key}&q=${this.location}&days=${this.days}`)
                 .then((result) =>{
                     return result.json();
             })
