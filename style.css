@@ -19,10 +19,29 @@ button{
 .switch{
     border-radius: 20px;
     color: white;
-    background-color: black;
+    background: none;
     border: 2px solid grey;
     box-shadow: 0px 2px 5px black;
     align-self: flex-start;
+    width: 100px;
+    display: flex;
+    padding: 0;
+}
+
+.switch>*{
+    border-radius: 10px;
+}
+
+.switch>#C{
+    flex-grow: 3;
+    background-color: white;
+    color: black;
+}
+
+.switch>#F{
+    flex-grow: 1;
+    background-color: black;
+    color: white;
 }
 
 .switch:hover{
@@ -80,3 +99,18 @@ input{
     border-radius: 10px;
 }
 
+
+#weatherNow{
+    margin-top: -20px;
+    margin-left: 5vw;
+    align-self: flex-start;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 2fr repeat(4, 0.5fr);
+    align-items: center;
+    text-align: left;
+}
+
+.value{
+    text-align: end;
+}

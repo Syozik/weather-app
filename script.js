@@ -1,5 +1,5 @@
 const key = "93daeb1a873444e8937213107240506";
-const properties = ["maxtemp_c", "maxtemp_f", "mintemp_c", "mintemp_f", "avgtemp_c", "daily_chance_of_rain", "avghumidity", "condition"]
+const properties = ["maxtemp_c", "maxtemp_f", "mintemp_c", "mintemp_f", "avgtemp_c", "daily_chance_of_rain", "avghumidity", "condition", "feelslike_c", "feelslike_f", "humidity", "temp_c", "temp_f", "wind_kph", "wind_mph"];
 
 function formatDate(date){
     let year = date.getFullYear();
@@ -11,9 +11,23 @@ function formatDate(date){
     return [year, month, day].join('-');
 }
 
+class GiphyApp{
+    static setGifBackground(prompt){        
+        fetch(`https://api.giphy.com/v1/gifs/translate?api_key=doEobmgf5viAQmgyCnjdQ0t7mkL72qOK&s=${prompt}`, {mode: 'cors'})
+        .then(function(response) {
+        return response.json();
+        })
+        .then(function(response) {
+            // console.log(response.data.images.original.url);
+            // document.body.style.background = `url(${response.data.images.original.url}) no-repeat center`;
+            // document.body.
+        });
+
+    }
+}
 
 class WeatherApp{
-    constructor(location, days=7, measure="c"){
+    constructor(location="New York", days=7, measure="c"){
         this.location = location;
         this.days = days;
         this.measure = measure;
@@ -27,6 +41,9 @@ class WeatherApp{
             })
                 .then(function(data){
                     resolve(data);
+            })
+            .catch((error)=>{
+                console.log(error)
             });
         })
     }
@@ -51,7 +68,8 @@ class WeatherApp{
         let data = weatherData["forecast"]["forecastday"]
         .filter(data => data["date"] == day)[0];
         let result = {"day":day};
-        result["wind"] = this.getWindSpeed(data["hour"],day);
+        result["wind"] = this.getWindSpeed(data["hour"]);
+        result["measure"] = this.measure;
         data = data["day"];
         let propertiesChecked = Object.keys(data).filter(property => properties.includes(String(property)));
         for (let property of propertiesChecked){
@@ -62,10 +80,33 @@ class WeatherApp{
             }
         }
         
+        
+        
+        
         return result;
     }
 
-    getWindSpeed(data, day){
+    changeLocation(newLocation){
+        this.location = newLocation;
+    }
+
+    async getCurrentWeather(){
+        let weatherData = await this.getWeatherData();
+        let currentData = weatherData.current
+        let result = {"measure": this.measure};
+        let currentPropertiesChecked  = Object.keys(currentData).filter(property => properties.includes(String(property)));
+        for (let property of currentPropertiesChecked){
+            if (property.slice(property.length - 2, property.length) != "_c" && property.slice(property.length - 2, property.length) != "_f"){
+                result[property] = currentData[property];
+            }else if(property[property.length -1] == this.measure){
+                result[property.slice(0, property.length-2)] = currentData[property];
+            }
+        }
+
+        return result;
+    }
+
+    getWindSpeed(data){
         let wind = this.measure? "wind_kph" : "wind_mph";
         let windSpeed = 0;
         let [start, finish] = [6, 22];
@@ -79,7 +120,7 @@ class WeatherApp{
 
 class DOMChanger{
     static appendDayWeather(weatherData){
-        console.log(weatherData);
+        // console.log(weatherData);
         let nextWeekField = document.querySelector(".weatherNextWeek");
         let newField = document.createElement("div");
         let background_url = weatherData["condition"]["icon"];
@@ -124,7 +165,7 @@ class DOMChanger{
         let wind = document.createElement("div");
         wind.innerHTML = "Wind";
         let windValue = document.createElement("div");
-        windValue.innerHTML = Math.round(weatherData.wind);
+        windValue.innerHTML = Math.round(weatherData.wind) + (weatherData.measure == "c" ? " kph" : " mph");
         wind.appendChild(windValue);
 
         for (let child of [dayTitle, maxTemp, avgTemp, minTemp, avghumidity, rain, wind]){
@@ -132,6 +173,46 @@ class DOMChanger{
         }
 
         nextWeekField.appendChild(newField);
+    }
+
+    static appendNowWeather(data){
+        let weatherNowNode = document.querySelector("#weatherNow");
+        weatherNowNode.innerHTML = "";
+        let title = document.createElement("h3");
+        title.innerHTML = "NOW";
+        title.style.cssText = "font-size: 2rem; color: white; place-self: center";
+        let weatherImg = document.createElement("img");
+        weatherImg.src = `https:${data["condition"]["icon"]}`;
+        weatherImg.style.cssText = "width: 70px; display: block; place-self: center";
+        
+        let temp = document.createElement("div");
+        temp.innerHTML = "Temperature:";
+        let tempValue = document.createElement("div");
+        tempValue.className = "value";
+        tempValue.innerHTML = data["temp"] + " °"+data.measure.toUpperCase();
+
+        let feelsLike = document.createElement("div");
+        feelsLike.innerHTML = "Feels like:";
+        let feelsLikeValue = document.createElement("div");
+        feelsLikeValue.innerHTML = data["feelslike"] + " °"+data.measure.toUpperCase();
+        feelsLikeValue.className = "value";
+        
+        let humidity = document.createElement("div");
+        humidity.innerHTML = "Humidity:";
+        let humidityValue = document.createElement("div");
+        humidityValue.className = "value";
+        humidityValue.innerHTML = data["humidity"] + "%";
+        
+        let wind = document.createElement("div");
+        wind.innerHTML = "Wind:";
+        let windValue = document.createElement("div");
+        windValue.innerHTML = Math.round(data["wind"+(data.measure == "c" ? "_kph" : "_mph")]) + (data.measure == "c" ? " kph" : " mph");
+        windValue.className = "value";
+        
+        
+        for (let child of [title, weatherImg, temp, tempValue, feelsLike, feelsLikeValue, humidity, humidityValue, wind, windValue]){
+            weatherNowNode.appendChild(child);
+        }
     }
 }
 
@@ -142,20 +223,50 @@ function addDays(date, days) {
 }
 
 class Main{
+    static switch = "c";    
     static async updateLocation(){
         let input = document.querySelector("#location").value;
+        if (input == ""){
+            return ;
+        }
         let nextWeakField = document.querySelector(".weatherNextWeek")
         nextWeakField.innerHTML = "";
+        let weatherNowNode = document.querySelector("#weatherNow");
+        weatherNowNode.innerHTML = "";
         let locationText = document.querySelector("#city");
-        let location = new WeatherApp(input, 8);
+        let location = new WeatherApp(input, 8, this.switch);
         let data = await location.getWeatherData()
-        locationText.innerHTML = "Weather Forecast for " + input;
+        locationText.innerHTML = "Weather in " + input;
         console.log(data);
         let today = data["location"]["localtime"].split(" ")[0];
+        DOMChanger.appendNowWeather(await location.getCurrentWeather());
         for (let i=1;i<8;i++){
             DOMChanger.appendDayWeather(await location.getData(addDays(today, i)));
         }
         
-        
     }
+
+    static changeMeasure(){
+        this.switch = this.switch == "c" ? "f" : "c";
+        let currentMeasure = document.querySelector(`.switch>#${this.switch.toUpperCase()}`);
+        let notCurrentMeasure = document.querySelector(`.switch>#${(this.switch == "c" ? "f":"c").toUpperCase()}`);
+        currentMeasure.style.cssText = `
+            flex-grow: 3;
+        background-color: white;
+        color: black;`;
+        notCurrentMeasure.style.cssText = `
+        flex-grow: 1;
+    background-color: black;
+    color: white;`;
+
+        this.updateLocation();
+    }
+
 }
+
+document.querySelector("#location")
+    .addEventListener("keyup", (event)=>{
+        if (event.keyCode == 13){
+            document.querySelector("#search").click();
+        }
+})

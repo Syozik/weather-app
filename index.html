@@ -8,13 +8,14 @@
     <script src="script.js" defer></script>
 </head>
 <body>
-    <button class="switch"><span id="C">°C</span> / <span id="F">°F</span></button>
+    <button class="switch" onclick="Main.changeMeasure()"><span id="C">°C</span> / <span id="F">°F</span></button>
     <div class = "content">
         <div class="weatherNow">
-            <input type="text" id="location" placeholder="Desired location">
+            <input type="text" id="location" placeholder="Desired location" required>
             <button id="search" onclick="Main.updateLocation()"><img src="pictures/magnify.svg"></button>
         </div>
-        <h2 id="city"></h2>
+        <h2 id="city">Please input a city</h2>
+        <div id="weatherNow"></div>
         <div class="weatherNextWeek">
 
         </div>
