@@ -42,6 +42,7 @@ button{
     flex-grow: 1;
     background-color: black;
     color: white;
+    opacity: 0.6;
 }
 
 .switch:hover{

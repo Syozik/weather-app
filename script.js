@@ -1,5 +1,5 @@
 const key = "93daeb1a873444e8937213107240506";
-const properties = ["maxtemp_c", "maxtemp_f", "mintemp_c", "mintemp_f", "avgtemp_c", "daily_chance_of_rain", "avghumidity", "condition", "feelslike_c", "feelslike_f", "humidity", "temp_c", "temp_f", "wind_kph", "wind_mph"];
+const properties = ["maxtemp_c", "maxtemp_f", "mintemp_c", "mintemp_f", "avgtemp_c","avgtemp_f", "daily_chance_of_rain", "avghumidity", "condition", "feelslike_c", "feelslike_f", "humidity", "temp_c", "temp_f", "wind_kph", "wind_mph"];
 
 function formatDate(date){
     let year = date.getFullYear();
@@ -13,7 +13,7 @@ function formatDate(date){
 
 class GiphyApp{
     static setGifBackground(prompt){        
-        fetch(`https://api.giphy.com/v1/gifs/translate?api_key=doEobmgf5viAQmgyCnjdQ0t7mkL72qOK&s=${prompt}`, {mode: 'cors'})
+        fetch(`https://api.giphy.com/v1/gifs/translate?api_key=YourKey=${prompt}`, {mode: 'cors'})
         .then(function(response) {
         return response.json();
         })
@@ -253,11 +253,13 @@ class Main{
         currentMeasure.style.cssText = `
             flex-grow: 3;
         background-color: white;
-        color: black;`;
+        color: black;
+        opacity: 1`;
         notCurrentMeasure.style.cssText = `
         flex-grow: 1;
     background-color: black;
-    color: white;`;
+    color: white;
+    opacity:0.6`;
 
         this.updateLocation();
     }
